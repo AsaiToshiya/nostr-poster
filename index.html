@@ -32,11 +32,19 @@
         const sk = window.NostrTools.nip19.decode(nsec.value).data;
         const pk = window.NostrTools.getPublicKey(sk);
 
+        const hashtags = (
+          content.value.match(
+            /(^|\s)#[a-z0-9\u3040-\u309f\u30a0-\u30ff\uff00-\uff9f\u4e00-\u9faf\u3400-\u4dbf]+/gi
+          ) ?? []
+        )
+          .map((tag) => ["t", tag.substring(1)])
+          .flat();
+
         const event = {
           kind: 1,
           pubkey: pk,
           created_at: Math.floor(Date.now() / 1000),
-          tags: [],
+          tags: [hashtags].filter((tag) => tag.length > 0),
           content: content.value,
         };
         event.id = window.NostrTools.getEventHash(event);
