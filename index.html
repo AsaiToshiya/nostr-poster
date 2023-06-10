@@ -28,6 +28,16 @@
         "wss://relay.nostr.bg",
       ];
 
+      const extractReferenceTags = (content) => {
+        return (
+          content.match(
+            /https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)/gi
+          ) ?? []
+        )
+          .map((url) => ["r", url])
+          .flat();
+      };
+
       const handleClick = async () => {
         const sk = window.NostrTools.nip19.decode(nsec.value).data;
         const pk = window.NostrTools.getPublicKey(sk);
@@ -44,7 +54,9 @@
           kind: 1,
           pubkey: pk,
           created_at: Math.floor(Date.now() / 1000),
-          tags: [hashtags].filter((tag) => tag.length > 0),
+          tags: [extractReferenceTags(content.value), hashtags].filter(
+            (tag) => tag.length > 0
+          ),
           content: content.value,
         };
         event.id = window.NostrTools.getEventHash(event);
