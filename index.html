@@ -28,6 +28,16 @@
         "wss://relay.nostr.bg",
       ];
 
+      const extractHashtagTags = (content) => {
+        return (
+          content.value.match(
+            /(^|\s)#[a-z0-9\u3040-\u309f\u30a0-\u30ff\uff00-\uff9f\u4e00-\u9faf\u3400-\u4dbf]+/gi
+          ) ?? []
+        )
+          .map((tag) => ["t", tag.substring(tag.indexOf("#") + 1)])
+          .flat();
+      };
+
       const extractReferenceTags = (content) => {
         return (
           content.match(
@@ -42,13 +52,7 @@
         const sk = window.NostrTools.nip19.decode(nsec.value).data;
         const pk = window.NostrTools.getPublicKey(sk);
 
-        const hashtags = (
-          content.value.match(
-            /(^|\s)#[a-z0-9\u3040-\u309f\u30a0-\u30ff\uff00-\uff9f\u4e00-\u9faf\u3400-\u4dbf]+/gi
-          ) ?? []
-        )
-          .map((tag) => ["t", tag.substring(tag.indexOf("#") + 1)])
-          .flat();
+        const hashtags = extractHashtagTags(content.value);
 
         const event = {
           kind: 1,
