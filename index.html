@@ -52,15 +52,14 @@
         const sk = window.NostrTools.nip19.decode(nsec.value).data;
         const pk = window.NostrTools.getPublicKey(sk);
 
-        const hashtags = extractHashtagTags(content.value);
-
         const event = {
           kind: 1,
           pubkey: pk,
           created_at: Math.floor(Date.now() / 1000),
-          tags: [extractReferenceTags(content.value), hashtags].filter(
-            (tag) => tag.length > 0
-          ),
+          tags: [
+            extractReferenceTags(content.value),
+            extractHashtagTags(content.value),
+          ].filter((tag) => tag.length > 0),
           content: content.value,
         };
         event.id = window.NostrTools.getEventHash(event);
