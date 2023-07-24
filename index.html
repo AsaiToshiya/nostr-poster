@@ -9,6 +9,8 @@
       content:
       <textarea id="content" rows="4" cols="50"></textarea>
     </div>
+    reply to:
+    <input id="nip19" type="text" size="50" /><br />
     nsec:
     <input id="nsec" type="text" size="50" /><br />
     <button onclick="handleClick()">投稿</button><br />
@@ -27,6 +29,29 @@
         "wss://relay.damus.io",
         "wss://relay.nostr.bg",
       ];
+
+      const createReplyTags = async (nip19) => {
+        return nip19
+          ? await (async (nip19) => {
+              const {
+                data: { id },
+              } = window.NostrTools.nip19.decode(nip19.replace(/^nostr:/, ""));
+              const pool = new window.NostrTools.SimplePool();
+              const event = await pool.get(RELAYS, {
+                ids: [id],
+              });
+              const pTags = event.tags.filter(
+                (tag) => tag[0] == "p" && tag[1] != event.pubkey
+              );
+              const hasETag = event.tags.some((tag) => tag[0] == "e");
+              return [
+                ...pTags,
+                ["e", event.id, "", hasETag ? "reply" : "root"],
+                ["p", event.pubkey],
+              ];
+            })(nip19)
+          : [];
+      };
 
       const extractHashtagTags = (content) => {
         return (
@@ -59,6 +84,7 @@
           tags: [
             extractReferenceTags(content.value),
             extractHashtagTags(content.value),
+            ...(await createReplyTags(nip19.value)),
           ].filter((tag) => tag.length > 0),
           content: content.value,
         };
