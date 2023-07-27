@@ -59,8 +59,7 @@
             /(^|\s)#[a-z0-9\u3040-\u309f\u30a0-\u30ff\uff00-\uff9f\u4e00-\u9faf\u3400-\u4dbf]+/gi
           ) ?? []
         )
-          .map((tag) => ["t", tag.substring(tag.indexOf("#") + 1)])
-          .flat();
+          .map((tag) => ["t", tag.substring(tag.indexOf("#") + 1)]);
       };
 
       const extractReferenceTags = (content) => {
@@ -69,8 +68,7 @@
             /https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)/gi
           ) ?? []
         )
-          .map((url) => ["r", url])
-          .flat();
+          .map((url) => ["r", url]);
       };
 
       const handleClick = async () => {
@@ -82,8 +80,8 @@
           pubkey: pk,
           created_at: Math.floor(Date.now() / 1000),
           tags: [
-            extractReferenceTags(content.value),
-            extractHashtagTags(content.value),
+            ...extractReferenceTags(content.value),
+            ...extractHashtagTags(content.value),
             ...(await createReplyTags(nip19.value)),
           ].filter((tag) => tag.length > 0),
           content: content.value,
