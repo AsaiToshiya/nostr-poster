@@ -9,8 +9,6 @@
       content:
       <textarea id="content" rows="4" cols="50"></textarea>
     </div>
-    kind:
-    <input id="kind" type="text" value="1" /><br />
     reply to:
     <input id="nip19" type="text" size="50" /><br />
     nsec:
@@ -78,7 +76,7 @@
         const pk = window.NostrTools.getPublicKey(sk);
 
         const event = {
-          kind: parseInt(kind.value, 10),
+          kind: 1,
           pubkey: pk,
           created_at: Math.floor(Date.now() / 1000),
           tags: [
