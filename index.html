@@ -16,6 +16,8 @@
       size="50"
       placeholder="nevent1... or nostr:nevent1..."
     /><br />
+    encryption nsec:
+    <input id="encryptionNsec" type="text" size="50" /><br />
     nsec:
     <input id="nsec" type="text" size="50" /><br />
     <button onclick="handleClick()">投稿</button><br />
@@ -83,8 +85,15 @@
               ...extractReferenceTags(content.value),
               ...extractHashtagTags(content.value),
               ...(await createReplyTags(nip19.value)),
+              ...(encryptionNsec.value ? [["encrypted"]] : []),
             ].filter((tag) => tag.length > 0),
-            content: content.value,
+            content: encryptionNsec.value
+              ? await window.NostrTools.nip04.encrypt(
+                  window.NostrTools.nip19.decode(encryptionNsec.value).data,
+                  pk,
+                  content.value
+                )
+              : content.value,
           },
           sk
         );
