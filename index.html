@@ -34,6 +34,16 @@
         "wss://relay.nostr.bg",
       ];
 
+      const createEventTags = (content) =>
+        [...window.NostrTools.nip27.matchAll(content)]
+          .filter(({ decoded: { type } }) => type == "nevent" || type == "note")
+          .map(({ decoded: { type, data } }) => [
+            "e",
+            data.id ? data.id : data,
+            "",
+            "mention",
+          ]);
+
       const createReplyTags = async (nip19) => {
         return nip19
           ? await (async (nip19) => {
@@ -82,6 +92,7 @@
             kind: 1,
             created_at: Math.floor(Date.now() / 1000),
             tags: [
+              ...createEventTags(content.value),
               ...extractReferenceTags(content.value),
               ...extractHashtagTags(content.value),
               ...(await createReplyTags(nip19.value)),
