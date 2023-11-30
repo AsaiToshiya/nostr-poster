@@ -44,6 +44,18 @@
             "mention",
           ]);
 
+      const createPubkeyTags = (content) =>
+        [...window.NostrTools.nip27.matchAll(content)]
+          .filter(
+            ({ decoded: { type } }) => type == "npub" || type == "nprofile"
+          )
+          .map(({ decoded: { type, data } }) => [
+            "p",
+            data.pubkey ? data.pubkey : data,
+            "",
+            "mention",
+          ]);
+
       const createReplyTags = async (nip19) => {
         return nip19
           ? await (async (nip19) => {
@@ -93,6 +105,7 @@
             created_at: Math.floor(Date.now() / 1000),
             tags: [
               ...createEventTags(content.value),
+              ...createPubkeyTags(content.value),
               ...extractReferenceTags(content.value),
               ...extractHashtagTags(content.value),
               ...(await createReplyTags(nip19.value)),
