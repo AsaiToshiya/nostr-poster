@@ -125,7 +125,7 @@
         const pool = new window.NostrTools.SimplePool();
         pool.publish(RELAYS, event);
 
-        document.querySelector("#event").innerHTML = JSON.stringify(
+        document.querySelector("#event").innerText = JSON.stringify(
           event,
           null,
           2
