@@ -20,7 +20,8 @@
     <input id="encryptionNsec" type="text" size="50" /><br />
     nsec:
     <input id="nsec" type="text" size="50" /><br />
-    <button onclick="handleClick()">投稿</button><br />
+    <button onclick="handleClick()">投稿</button>
+    <button onclick="handleStringifyClick()">stringify (not post)</button><br />
     event:
     <pre id="event"></pre>
 
@@ -124,6 +125,40 @@
 
         const pool = new window.NostrTools.SimplePool();
         pool.publish(RELAYS, event);
+
+        document.querySelector("#event").innerText = JSON.stringify(
+          event,
+          null,
+          2
+        );
+      };
+
+      const handleStringifyClick = async () => {
+        const sk = window.NostrTools.nip19.decode(nsec.value).data;
+        const pk = window.NostrTools.getPublicKey(sk);
+
+        const event = window.NostrTools.finishEvent(
+          {
+            kind: 1,
+            created_at: Math.floor(Date.now() / 1000),
+            tags: [
+              ...createEventTags(content.value),
+              ...createPubkeyTags(content.value),
+              ...extractReferenceTags(content.value),
+              ...extractHashtagTags(content.value),
+              ...(await createReplyTags(nip19.value)),
+              ...(encryptionNsec.value ? [["encrypted"]] : []),
+            ].filter((tag) => tag.length > 0),
+            content: encryptionNsec.value
+              ? await window.NostrTools.nip04.encrypt(
+                  window.NostrTools.nip19.decode(encryptionNsec.value).data,
+                  pk,
+                  content.value
+                )
+              : content.value,
+          },
+          sk
+        );
 
         document.querySelector("#event").innerText = JSON.stringify(
           event,
