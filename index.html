@@ -27,7 +27,7 @@
 
     <script src="https://unpkg.com/nostr-tools/lib/nostr.bundle.js"></script>
     <script>
-      const RELAYS = [
+      const relays = [
         "wss://nos.lol",
         "wss://nostr.bitcoiner.social",
         "wss://nostr.mom",
@@ -92,7 +92,7 @@
                 data: { id },
               } = window.NostrTools.nip19.decode(nip19.replace(/^nostr:/, ""));
               const pool = new window.NostrTools.SimplePool();
-              const event = await pool.get(RELAYS, {
+              const event = await pool.get(relays, {
                 ids: [id],
               });
               const pTags = event.tags.filter(
@@ -128,7 +128,7 @@
         const event = await createEvent();
 
         const pool = new window.NostrTools.SimplePool();
-        pool.publish(RELAYS, event);
+        pool.publish(relays, event);
 
         document.querySelector("#event").innerText = JSON.stringify(
           event,
